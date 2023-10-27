@@ -13,7 +13,7 @@ provider "kubernetes" {
 }
 
 resource "aws_security_group" "eks_msk" {
-  name   = "${local.cluster_name}-msk"
+  name   = "${var.cluster_name}-msk"
   vpc_id = module.vpc.vpc_id
 
 }
@@ -21,8 +21,8 @@ resource "aws_security_group" "eks_msk" {
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "~> 18.20"
-  cluster_name    = local.cluster_name
-  cluster_version = "1.22"
+  cluster_name    = var.cluster_name
+  cluster_version = "1.28"
   vpc_id          = module.vpc.vpc_id
   subnet_ids      = module.vpc.private_subnets
   enable_irsa     = true
@@ -32,11 +32,13 @@ module "eks" {
 
   cluster_addons = {
     coredns = {
-      resolve_conflicts = "OVERWRITE"
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
     }
     kube-proxy = {}
     vpc-cni = {
-      resolve_conflicts = "OVERWRITE"
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
     }
   }
   manage_aws_auth_configmap = true
@@ -87,12 +89,12 @@ module "eks" {
   }
 
   node_security_group_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = null
+    "kubernetes.io/cluster/${var.cluster_name}" = null
   }
 }
 
 output "cluster_name" {
-  value = local.cluster_name
+  value = var.cluster_name
 }
 
 output "region" {

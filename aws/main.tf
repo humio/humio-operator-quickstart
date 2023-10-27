@@ -1,17 +1,17 @@
 terraform {
-  required_version = ">= 1.1.0"
+  required_version = ">= 1.6.0"
   required_providers {
     aws = {
-      version = ">= 2.28.1"
+      version = ">= 5.26.0"
     }
     kubernetes = {
-      version = "~> 2.11"
+      version = "~> 2.23"
     }
     random = {
-      version = "~> 3.1"
+      version = "~> 3.5.1"
     }
     local = {
-      version = "~> 2"
+      version = "~> 2.4.0"
     }
   }
 }
@@ -19,7 +19,7 @@ terraform {
 provider "aws" {
   default_tags {
     tags = {
-      Name          = local.cluster_name
+      Name          = var.cluster_name
       Environment   = var.environment
       App           = "humio"
       DeployVersion = "0.1.0"
@@ -31,15 +31,3 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 data "aws_organizations_organization" "current" {}
-
-locals {
-  cluster_name = "humio-quickstart-${random_string.suffix.result}"
-}
-
-resource "random_string" "suffix" {
-  length  = 4
-  special = false
-  lower   = true
-  upper   = false
-  number  = false
-}
