@@ -49,9 +49,14 @@ variable "service_account_name" {
 
 variable "environment" {
   type    = string
-  default = "Production"
+  default = "development"
 }
 variable "owner" {
   type    = string
   default = "humio"
+}
+
+variable "cluster_name" {
+  type    = string
+  default = "humio-quickstart-example"
 }

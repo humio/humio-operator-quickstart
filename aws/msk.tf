@@ -3,20 +3,26 @@ resource "aws_security_group" "msk" {
 }
 
 resource "aws_kms_key" "kms" {
-  description = "Key for ${local.cluster_name}"
+  description = "Key for ${var.cluster_name}"
 }
 
 resource "aws_msk_cluster" "msk" {
-  cluster_name           = local.cluster_name
+  cluster_name           = var.cluster_name
   kafka_version          = var.kafka_version
   number_of_broker_nodes = var.kafka_instance_count
 
   broker_node_group_info {
     instance_type   = var.kafka_instance_type
-    ebs_volume_size = var.kafka_volume_size
     client_subnets  = module.vpc.private_subnets
     security_groups = [aws_security_group.msk.id]
+    
+    storage_info {
+      ebs_storage_info {
+        volume_size = var.kafka_volume_size
+      }
+    }
   }
+
 
   encryption_info {
     encryption_at_rest_kms_key_arn = aws_kms_key.kms.arn
